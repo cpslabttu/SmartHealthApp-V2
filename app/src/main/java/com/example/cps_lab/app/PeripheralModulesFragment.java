@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.example.cps_lab.R;
+import com.example.cps_lab.app.imagetransfer.ImageTransferFragment;
+import com.example.cps_lab.app.neopixel.NeopixelFragment;
 import com.example.cps_lab.ble.central.BlePeripheral;
 import com.example.cps_lab.ble.central.BlePeripheralBattery;
 import com.example.cps_lab.ble.central.BlePeripheralDfu;
@@ -222,28 +224,28 @@ public class PeripheralModulesFragment extends ConnectedPeripheralFragment {
                 break;
 
             case MODULE_UART:
-                //fragment = UartModeFragment.newInstance(singlePeripheralIdentifier);
+                fragment = UartModeFragment.newInstance(singlePeripheralIdentifier);
                 break;
 
             case MODULE_PLOTTER:
-                //fragment = PlotterFragment.newInstance(singlePeripheralIdentifier);
+                fragment = PlotterFragment.newInstance(singlePeripheralIdentifier);
                 break;
 
             case MODULE_PINIO:
                 if (singlePeripheralIdentifier != null) {
-                    //fragment = PinIOFragment.newInstance(singlePeripheralIdentifier);
+                    fragment = PinIOFragment.newInstance(singlePeripheralIdentifier);
                 }
                 break;
 
             case MODULE_CONTROLLER:
                 if (singlePeripheralIdentifier != null) {
-                    //fragment = ControllerFragment.newInstance(singlePeripheralIdentifier);
+                    fragment = ControllerFragment.newInstance(singlePeripheralIdentifier);
                 }
                 break;
 
             case MODULE_NEOPIXEL:
                 if (singlePeripheralIdentifier != null) {
-                    //fragment = NeopixelFragment.newInstance(singlePeripheralIdentifier);
+                    fragment = NeopixelFragment.newInstance(singlePeripheralIdentifier);
                 }
                 break;
 
@@ -251,16 +253,16 @@ public class PeripheralModulesFragment extends ConnectedPeripheralFragment {
                 break;
 
             case MODULE_THERMALCAMERA:
-                //fragment = ThermalCameraFragment.newInstance(singlePeripheralIdentifier);
+                fragment = ThermalCameraFragment.newInstance(singlePeripheralIdentifier);
                 break;
 
             case MODULE_IMAGETRANSFER:
-                //fragment = ImageTransferFragment.newInstance(singlePeripheralIdentifier);
+                fragment = ImageTransferFragment.newInstance(singlePeripheralIdentifier);
                 break;
 
             case MODULE_DFU:
                 if (singlePeripheralIdentifier != null) {
-                    //fragment = DfuFragment.newInstance(singlePeripheralIdentifier);
+                    fragment = DfuFragment.newInstance(singlePeripheralIdentifier);
                 }
                 break;
         }

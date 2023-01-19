@@ -376,10 +376,10 @@ public class ScannerFragment extends Fragment implements ScannerStatusFragmentDi
             if (getActivity() != null && !getActivity().isFinishing()) {        // Check that is not finishing to avoid badtokenexceptions
                 if (errorCode != null && errorCode == ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED) {       // Check for known errors
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    AlertDialog dialog = builder.setTitle(R.string.dialog_error).setMessage(R.string.bluetooth_scanner_errorregisteringapp)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .show();
-                    DialogUtils.keepDialogOnOrientationChanges(dialog);
+//                    AlertDialog dialog = builder.setTitle(R.string.dialog_error).setMessage(R.string.bluetooth_scanner_errorregisteringapp)
+//                            .setPositiveButton(android.R.string.ok, null)
+//                            .show();
+//                    DialogUtils.keepDialogOnOrientationChanges(dialog);
                 } else {        // Ask for location permission
                     mListener.scannerRequestLocationPermissionIfNeeded();
                 }

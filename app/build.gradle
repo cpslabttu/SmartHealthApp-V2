@@ -3,16 +3,16 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.example.cps_lab"
         minSdkVersion 26
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 47
-        versionName "3.3.2"
+        versionName "7.3.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
-        resValue "string", "app_name", "CPS_LAB"
+        resValue "string", "app_name", "Smart Health V2"
 
         ndk {
             abiFilters "armeabi-v7a", "x86"
@@ -126,5 +126,7 @@ dependencies {
     implementation group: 'com.opencsv', name: 'opencsv', version: '3.7'
 
     implementation 'org.apache.commons:commons-math3:3.6.1'
+
+    implementation "com.google.android.material:material:1.2.1"
 
 }

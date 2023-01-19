@@ -25,7 +25,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-
 import com.example.cps_lab.BluefruitApplication;
 import com.example.cps_lab.R;
 import com.example.cps_lab.ble.BleUtils;
@@ -42,7 +41,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.security.ProviderInstaller;
 
-public class MainActivity extends AppCompatActivity implements ScannerFragment.ScannerFragmentListener {
+public class MainActivity extends AppCompatActivity implements ScannerFragment.ScannerFragmentListener, PeripheralModulesFragment.PeripheralModulesFragmentListener, DfuProgressFragmentDialog.Listener {
 
     // Constants
     private final static String TAG = MainActivity.class.getSimpleName();

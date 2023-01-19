@@ -136,7 +136,7 @@ public class PeripheralModeFragment extends Fragment {
                             break;
                         case 1:
 
-                            //fragment = UartServiceFragment.newInstance();
+                            fragment = UartServiceFragment.newInstance();
                             fragmentTag = "UartService";
                             break;
                     }

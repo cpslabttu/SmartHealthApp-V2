@@ -272,26 +272,15 @@ class BlePeripheralsAdapter extends RecyclerView.Adapter<BlePeripheralsAdapter.V
                 @Override
                 public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
                     return mBlePeripherals.get(oldItemPosition).equals(blePeripherals.get(newItemPosition));
-/*
-                    ScanResult oldScanResult = mBlePeripherals.get(oldItemPosition);
-                    ScanResult newScanResult = scanResults.get(newItemPosition);
-
-                    return getDrawableIdForRssi(oldScanResult.getRssi()) == getDrawableIdForRssi(newScanResult.getRssi());
-*/
                 }
             });
             mBlePeripherals = blePeripherals;
-
-            // Save and restore state to preserve user scroll
-            // https://stackoverflow.com/questions/43458146/diffutil-in-recycleview-making-it-autoscroll-if-a-new-item-is-added
             RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
             if (layoutManager != null) {
                 Parcelable recyclerViewState = layoutManager.onSaveInstanceState();
                 result.dispatchUpdatesTo(this);
                 layoutManager.onRestoreInstanceState(recyclerViewState);
             }
-
-//            result.dispatchUpdatesTo((ListUpdateCallback)this);
         }
     }
 

@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="350dp"
         android:src="@mipmap/ic_launcher_ssc_health_round"
         tools:ignore="ContentDescription" />
 
@@ -35,10 +35,10 @@
     </FrameLayout>
 -->
 
+
     <FrameLayout
         android:id="@+id/navigationContentLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </FrameLayout>
+        android:layout_height="match_parent" />
 
 </RelativeLayout>
