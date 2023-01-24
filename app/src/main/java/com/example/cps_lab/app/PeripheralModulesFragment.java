@@ -384,7 +384,7 @@ public class PeripheralModulesFragment extends ConnectedPeripheralFragment {
                     detailsViewHolder.nameTextView.setText(name);
                     final int rssi = blePeripheral.getRssi();
                     detailsViewHolder.rssiImageView.setImageResource(RssiUI.getDrawableIdForRssi(rssi));
-                    detailsViewHolder.rssiTextView.setText(String.format(Locale.ENGLISH, mContext.getString(R.string.peripheralmodules_rssi_format), rssi));
+                    //detailsViewHolder.rssiTextView.setText(String.format(Locale.ENGLISH, mContext.getString(R.string.peripheralmodules_rssi_format), rssi));
 
                     BlePeripheralBattery blePeripheralBattery = getPeripheralBatteryForPeripheral(blePeripheral);
                     final boolean hasBattery = blePeripheralBattery != null && blePeripheralBattery.getCurrentBatteryLevel() >= 0;      // if batter value is -1 means that is not available
@@ -494,15 +494,16 @@ public class PeripheralModulesFragment extends ConnectedPeripheralFragment {
                 final boolean hasUart = BlePeripheralUart.hasUart(mBlePeripheral);
                 final boolean hasDfu = BlePeripheralDfu.hasDfu(mBlePeripheral);
 
-                if (hasUart && hasDfu) {
-                    return new int[]{MODULE_INFO, MODULE_UART, MODULE_PLOTTER, MODULE_PINIO, MODULE_CONTROLLER, MODULE_NEOPIXEL, MODULE_THERMALCAMERA, MODULE_IMAGETRANSFER, MODULE_DFU};
-                } else if (hasUart) {
-                    return new int[]{MODULE_INFO, MODULE_UART, MODULE_PLOTTER, MODULE_PINIO, MODULE_CONTROLLER, MODULE_THERMALCAMERA, MODULE_IMAGETRANSFER};
-                } else if (hasDfu) {
-                    return new int[]{MODULE_INFO, MODULE_DFU};
-                } else {
-                    return new int[]{MODULE_INFO};
-                }
+//                if (hasUart && hasDfu) {
+//                    return new int[]{MODULE_INFO, MODULE_UART, MODULE_PLOTTER, MODULE_PINIO, MODULE_CONTROLLER, MODULE_NEOPIXEL, MODULE_THERMALCAMERA, MODULE_IMAGETRANSFER, MODULE_DFU};
+//                } else if (hasUart) {
+//                    return new int[]{MODULE_INFO, MODULE_UART, MODULE_PLOTTER, MODULE_PINIO, MODULE_CONTROLLER, MODULE_THERMALCAMERA, MODULE_IMAGETRANSFER};
+//                } else if (hasDfu) {
+//                    return new int[]{MODULE_INFO, MODULE_DFU};
+//                } else {
+//                    return new int[]{MODULE_INFO};
+//                }
+                return new int[]{MODULE_UART, MODULE_PLOTTER};
             }
         }
 
@@ -526,7 +527,7 @@ public class PeripheralModulesFragment extends ConnectedPeripheralFragment {
                 super(view);
                 nameTextView = view.findViewById(R.id.nameTextView);
                 rssiImageView = view.findViewById(R.id.rssiImageView);
-                rssiTextView = view.findViewById(R.id.rssiTextView);
+                //rssiTextView = view.findViewById(R.id.rssiTextView);
                 batteryGroupView = view.findViewById(R.id.batteryGroupView);
                 batteryTextView = view.findViewById(R.id.batteryTextView);
             }

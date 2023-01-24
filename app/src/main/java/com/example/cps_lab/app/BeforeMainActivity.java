@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.example.cps_lab.R;
 
@@ -22,6 +21,7 @@ public class BeforeMainActivity extends AppCompatActivity {
         logIn= (Button) findViewById(R.id.login);
         signUp= (Button) findViewById(R.id.signup);
         guestAccess= (Button) findViewById(R.id.guestaccess);
+        guestAccess.setVisibility(View.GONE);
 
         logIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,7 +40,7 @@ public class BeforeMainActivity extends AppCompatActivity {
         guestAccess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(BeforeMainActivity.this, MainActivity.class);
+                Intent intent = new Intent(BeforeMainActivity.this, AfterLoginActivity.class);
                 startActivity(intent);
             }
         });

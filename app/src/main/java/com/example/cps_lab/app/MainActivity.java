@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements ScannerFragment.S
         // Back navigation listener
         fragmentManager.addOnBackStackChangedListener(() -> {
             if (fragmentManager.getBackStackEntryCount() == 0) {        // Check if coming back
-                mMainFragment.disconnectAllPeripherals();
+                //mMainFragment.disconnectAllPeripherals();
             }
         });
 

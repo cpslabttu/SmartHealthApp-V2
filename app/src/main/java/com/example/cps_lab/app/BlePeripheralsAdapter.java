@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
@@ -332,6 +333,20 @@ class BlePeripheralsAdapter extends RecyclerView.Adapter<BlePeripheralsAdapter.V
                 }
             }
         });
+        holder.proceedButton.setOnClickListener(view -> {
+            KeyboardUtils.dismissKeyboard(view);
+
+            BlePeripheral selectedBlePeripheral = weakBlePeripheral.get();
+            if (selectedBlePeripheral != null){
+                if(connectionState == BlePeripheral.STATE_CONNECTED){
+                    selectedBlePeripheral.connect(mContext);
+                }
+                else{
+                    Toast.makeText(mContext, "Please Connect to the Device first", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         holder.view.setOnClickListener(view -> holder.togleExpanded());
 
         // Expanded view
@@ -353,6 +368,7 @@ class BlePeripheralsAdapter extends RecyclerView.Adapter<BlePeripheralsAdapter.V
         TextView descriptionTextView;
         ImageView rssiImageView;
         Button connectButton;
+        Button proceedButton;
         Button rawDataButton;
         TextView dataTextView;
         String deviceAddress;
@@ -367,10 +383,12 @@ class BlePeripheralsAdapter extends RecyclerView.Adapter<BlePeripheralsAdapter.V
             descriptionTextView = view.findViewById(R.id.descriptionTextView);
             rssiImageView = view.findViewById(R.id.rssiImageView);
             connectButton = view.findViewById(R.id.connectButton);
+            proceedButton = view.findViewById(R.id.proceedButton);
             deviceAddress = null;
             expandedViewGroup = view.findViewById(R.id.expandedViewGroup);
             expandedViewGroup.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
             rawDataButton = view.findViewById(R.id.rawDataButton);
+            rawDataButton.setVisibility(View.GONE);
             dataTextView = view.findViewById(R.id.dataTextView);
         }
 

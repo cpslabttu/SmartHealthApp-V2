@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".app.RegisterActivity">
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <EditText
         android:id="@+id/username"
@@ -29,7 +33,7 @@
 
         <EditText
             android:id="@+id/password"
-            android:layout_width="250dp"
+            android:layout_width="210dp"
             android:layout_height="wrap_content"
             android:hint="Password"
             android:inputType="textPassword"/>
@@ -46,7 +50,7 @@
 
         <EditText
             android:id="@+id/confirm_password"
-            android:layout_width="250dp"
+            android:layout_width="210dp"
             android:layout_height="wrap_content"
             android:hint="Confirm Password"
             android:inputType="textPassword"/>
@@ -112,9 +116,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="120dp"
         android:ems="15"
         android:text="Login"
-        android:layout_alignParentBottom="true"/>
+        android:layout_below="@+id/btn_register"/>
 
+    </RelativeLayout>
 
-</RelativeLayout>
+</ScrollView>

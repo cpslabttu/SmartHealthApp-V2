@@ -67,6 +67,7 @@
     <!-- Scan Result -->
     <string name="scanresult_connect">Connect</string>
     <string name="scanresult_disconnect">Disconnect</string>
+    <string name="scanresult_proceed">Proceed</string>
 
     <string name="scanresult_advertisement_viewrawdata">View Raw Data</string>
     <string name="scanresult_advertisement_rawdata_title">Advertising Raw Data</string>

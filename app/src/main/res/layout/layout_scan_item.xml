@@ -61,8 +61,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:minWidth="110dp"
+            android:minWidth="80dp"
             android:text="@string/scanresult_connect" />
+
+        <Button
+            android:id="@+id/proceedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:minWidth="80dp"
+            android:text="@string/scanresult_proceed" />
+
     </LinearLayout>
 
     <LinearLayout
