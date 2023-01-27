@@ -9,7 +9,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 47
-        versionName "7.3.2"
+        versionName "1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         resValue "string", "app_name", "Smart Health V2"

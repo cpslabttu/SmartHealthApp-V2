@@ -39,6 +39,8 @@ import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -150,6 +152,7 @@ public class ScannerFragment extends Fragment implements ScannerStatusFragmentDi
     @Override
     public void onViewCreated(@NonNull final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setActionBarTitle(R.string.device);
 
         final Context context = getContext();
 
@@ -766,4 +769,15 @@ public class ScannerFragment extends Fragment implements ScannerStatusFragmentDi
     }
 
     // endregion
+
+    protected void setActionBarTitle(int titleStringId) {
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity != null) {
+            ActionBar actionBar = activity.getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(titleStringId);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
+        }
+    }
 }

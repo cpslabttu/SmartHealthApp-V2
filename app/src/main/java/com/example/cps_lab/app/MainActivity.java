@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements ScannerFragment.S
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (savedInstanceState == null) {
             // Set mainmenu fragment

@@ -13,6 +13,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 
 import com.example.cps_lab.R;
+import com.example.cps_lab.ble.central.BlePeripheral;
+import com.example.cps_lab.ble.central.BleScanner;
+
+import java.util.List;
 
 public class AfterLoginActivity extends AppCompatActivity {
 
@@ -56,6 +60,10 @@ public class AfterLoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 editor.clear();
                 editor.commit();
+                List<BlePeripheral> connectedPeriperals = BleScanner.getInstance().getConnectedOrConnectingPeripherals();
+                for (BlePeripheral blePeripheral : connectedPeriperals) {
+                    blePeripheral.disconnect();
+                }
                 Intent intent = new Intent(AfterLoginActivity.this, BeforeMainActivity.class);
                 startActivity(intent);
             }

@@ -8,6 +8,7 @@ import android.graphics.DashPathEffect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,6 +50,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class PlotterFragment extends ConnectedPeripheralFragment implements UartDataManager.UartDataManagerListener {
     // Log
@@ -73,6 +79,9 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
     private Map<String, List<LineDataSet>> mDataSetsForPeripheral = new HashMap<>();
     private LineDataSet mLastDataSetModified;
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
+
+    private ArrayList<Double> timerData = new ArrayList<>();
+    private int counter = 0;
 
     // region Fragment Lifecycle
     public static PlotterFragment newInstance(@Nullable String singlePeripheralIdentifier) {
@@ -492,10 +501,8 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                 if(signal > 0){
                     count++;
                 }
-                heartRateEditText.setText(String.valueOf(signal));
-
             }
-            System.out.println("Count : " + count);
+            //System.out.println("Count : " + count);
 //            System.out.println();
 //
 //            // print filtered data
@@ -529,7 +536,20 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 //                }
 //            }
 
-
+            /* Heart Rate Calculation */
+            counter++;
+            timerData.addAll(filteredDataList);
+            if(counter % 10 == 0) {
+                List<Integer> rPeaks = RPeakDetector.detectRPeaks(timerData);
+                double heartRate = calculateHeartRate(rPeaks, 10);
+                System.out.println("HJJJJJJJJJJJJJF " + heartRate);
+                if (heartRate > 60 && heartRate < 120) {
+                    heartRateEditText.setTextIsSelectable(true);
+                    heartRateEditText.setMovementMethod(LinkMovementMethod.getInstance());
+                    heartRateEditText.setText(String.valueOf((int) heartRate));
+                }
+                timerData = new ArrayList<>();
+            }
 
             for (Double filteredData : filteredDataList) {
                 String lineString= Double.toString(filteredData);
@@ -561,7 +581,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 
                 mMainHandler.post(this::notifyDataSetChanged);
             }
-
+            //timerSetUp();
         }
 
         mUartDataManager.removeRxCacheFirst(lastSeparator, peripheralIdentifier);
@@ -631,6 +651,68 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 
         return returnMap;
 
+    }
+
+    public void timerSetUp() {
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+            if (timerData.size() > 0) {
+                ArrayList<Integer> rPeaks = RPeakDetector.detectRPeaks(timerData);
+
+
+                // Calculate heart rate from R peaks
+                double heartRate = 0;
+                for (int i = 1; i < rPeaks.size(); i++) {
+                    if(rPeaks.get(i) != rPeaks.get(i-1)) {
+                        //System.out.println(rPeaks.get(i) + "               " + rPeaks.get(i - 1));
+                        double rrInterval = rPeaks.get(i) - rPeaks.get(i - 1); // time between consecutive R peaks
+                        heartRate += (60 / rrInterval); // add heart rate for this R-R interval
+                    }
+                }
+                heartRate /= (rPeaks.size() - 1); // average heart rate
+
+                System.out.println("UCCCCCCCCCCCCCCCCCCCCCC " + heartRate);
+
+                heartRateEditText.setTextIsSelectable(true);
+                heartRateEditText.setMovementMethod(LinkMovementMethod.getInstance());
+                heartRateEditText.setText(String.valueOf((int)heartRate));
+            }
+        }, 0, 5, TimeUnit.SECONDS);
+    }
+
+    public static double calculateHeartRate(List<Integer> rPeaks, int windowSize) {
+        // Get the difference in time between each R peak
+        List<Double> rrIntervals = new ArrayList<>();
+        for (int i = 1; i < rPeaks.size(); i++) {
+            double rrInterval = rPeaks.get(i) - rPeaks.get(i - 1);
+            rrIntervals.add(rrInterval);
+        }
+
+        // Initialize a moving average window
+        double[] window = new double[windowSize];
+        int windowIndex = 0;
+
+        // Calculate the moving average of the R-R intervals
+        List<Double> movingAvgRRIntervals = new ArrayList<>();
+        for (double rrInterval : rrIntervals) {
+            window[windowIndex] = rrInterval;
+            double sum = 0;
+            for (double interval : window) {
+                sum += interval;
+            }
+            double avgRRInterval = sum / windowSize;
+            movingAvgRRIntervals.add(avgRRInterval);
+            windowIndex = (windowIndex + 1) % windowSize;
+        }
+
+        // Calculate heart rate in beats per minute
+        double sum = 0;
+        for (double avgRRInterval : movingAvgRRIntervals) {
+            sum += avgRRInterval;
+        }
+        double avgRRInterval = sum / movingAvgRRIntervals.size();
+        double heartRate = 60 / avgRRInterval;
+        return heartRate;
     }
 
     // endregion
