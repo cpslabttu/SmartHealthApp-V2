@@ -172,7 +172,7 @@
 
 
     <!-- Uart -->
-    <string name="uart_tab_title">UART</string>
+    <string name="uart_tab_title">DATA</string>
     <string name="uart_navigation_title_format" formatted="false">UART - %s</string>
 
 
@@ -191,6 +191,7 @@
     <string name="uart_export_nodata">No data to export</string>
     <string name="uart_export_save_message">Export Data to File</string>
     <string name="uart_export_save_prompt">Export</string>
+    <string name="plotter_csv">CSV</string>
 
     <string name="uart_settings_displayMode_title">Display Mode</string>
     <string name="uart_settings_displayMode_timestamp">Timestamp</string>
@@ -279,7 +280,7 @@
 
 
     <!-- Plotter -->
-    <string name="plotter_tab_title">Plotter</string>
+    <string name="plotter_tab_title">PLOTTER</string>
     <string name="plotter_navigation_title_format" formatted="false">Plotter - %s</string>
     <string name="plotter_autoscroll">AutoScroll:</string>
     <string name="plotter_width">Width:</string>

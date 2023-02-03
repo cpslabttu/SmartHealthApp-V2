@@ -82,8 +82,6 @@ public class RPeakDetector {
 
         // Find the QRS complex in the integrated ECG signal
 //        ArrayList<Integer> qrsIndex = findQRS(integratedEcg, 0.5);
-//
-//        System.out.println("QRS complex at index: " + qrsIndex);
 
         double[] thresholdedSignal = applyThreshold(differentiatedEcg);
         ArrayList<Integer> rPeaks = new ArrayList<>();

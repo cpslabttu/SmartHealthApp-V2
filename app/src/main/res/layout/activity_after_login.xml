@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="150dp"
         android:hint="Device Connect"
         android:padding="10dp"
         android:background="@drawable/rounded_btn"
@@ -26,27 +26,27 @@
         android:textStyle="bold|italic"
         />
 
-    <Button
-        android:id="@+id/diagonistic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="200dp"
-        android:background="@drawable/rounded_btn_purple"
-        android:hint="Diagonistic"
-        android:padding="10dp"
-        android:textColorHint="#fff"
-        android:textSize="20sp"
-        android:minWidth="150dp"
-        android:textStyle="bold|italic" />
+<!--    <Button-->
+<!--        android:id="@+id/diagonistic"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_marginTop="200dp"-->
+<!--        android:background="@drawable/rounded_btn_dark"-->
+<!--        android:hint="Diagonistic"-->
+<!--        android:padding="10dp"-->
+<!--        android:textColorHint="#fff"-->
+<!--        android:textSize="20sp"-->
+<!--        android:minWidth="150dp"-->
+<!--        android:textStyle="bold|italic" />-->
 
     <Button
         android:id="@+id/instructions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="300dp"
-        android:background="@drawable/rounded_btn_dark"
+        android:layout_marginTop="250dp"
+        android:background="@drawable/rounded_btn_purple"
         android:hint="Instructions"
         android:padding="10dp"
         android:textColorHint="#fff"

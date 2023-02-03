@@ -33,7 +33,7 @@ public class AfterLoginActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         deviceConnect = (Button) findViewById(R.id.device_connect);
-        diagonistic = (Button) findViewById(R.id.diagonistic);
+        //diagonistic = (Button) findViewById(R.id.diagonistic);
         logout = (Button) findViewById(R.id.btn_logout);
 
         prefs = getSharedPreferences("UserData", MODE_PRIVATE);
@@ -47,13 +47,13 @@ public class AfterLoginActivity extends AppCompatActivity {
             }
         });
 
-        diagonistic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(AfterLoginActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
+//        diagonistic.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(AfterLoginActivity.this, MainActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override

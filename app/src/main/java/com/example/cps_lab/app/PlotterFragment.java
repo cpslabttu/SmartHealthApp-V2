@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.method.LinkMovementMethod;
@@ -16,8 +17,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,9 +42,12 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.opencsv.CSVWriter;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -68,6 +74,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
     private SeekBar xMaxEntriesSeekBar;
     private LineChart mChart;
     private EditText heartRateEditText;
+    private EditText avgHeartRateEditText;
 
     // Data
     private UartDataManager mUartDataManager;
@@ -82,6 +89,9 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 
     private ArrayList<Double> timerData = new ArrayList<>();
     private int counter = 0;
+    private Button csvButton;
+
+    private List<String[]> heatRateData = new ArrayList<String[]>();
 
     // region Fragment Lifecycle
     public static PlotterFragment newInstance(@Nullable String singlePeripheralIdentifier) {
@@ -118,6 +128,9 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
         // UI
         mChart = view.findViewById(R.id.chart);
         heartRateEditText= view.findViewById(R.id.heartBeatRate);
+        avgHeartRateEditText= view.findViewById(R.id.avgheartBeatRate);
+        csvButton = view.findViewById(R.id.csv_button);
+        csvButton.setVisibility(View.GONE);
         WeakReference<PlotterFragment> weakThis = new WeakReference<>(this);
         SwitchCompat autoscrollSwitch = view.findViewById(R.id.autoscrollSwitch);
         autoscrollSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -163,6 +176,23 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
             setupChart();
             setupUart();
         }
+
+        long startTime = System.currentTimeMillis();
+        csvButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                CSVWriter writer = null;
+                try {
+                    writer = new CSVWriter(new FileWriter(csv));
+                    writer.writeAll(heatRateData); // data is adding to csv
+
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
@@ -188,7 +218,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_help, menu);
+        inflater.inflate(R.menu.menu_plotter, menu);
     }
 
     @Override
@@ -206,6 +236,19 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                         fragmentTransaction.addToBackStack(null);
                         fragmentTransaction.commit();
                     }
+                }
+                return true;
+
+
+            case R.id.action_csv:
+                CSVWriter writer = null;
+                try {
+                    writer = new CSVWriter(new FileWriter(csv));
+                    writer.writeAll(heatRateData); // data is adding to csv
+
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
                 return true;
 
@@ -406,7 +449,11 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 
     // region UartDataManagerListener
     private static final byte kLineSeparator = 10;
-    private int count= 0;
+    private int count = 0;
+    private int avgHeartRate = 0;
+    private int heartRateCount = 0;
+    private int avgHeartBeatRate = 0;
+    private  String csv = (Environment.getExternalStorageDirectory().getAbsolutePath() + "/HeartRate.csv");
 
     @Override
     public void onUartRx(@NonNull byte[] data, @Nullable String peripheralIdentifier) {
@@ -444,25 +491,8 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                 l+=2;
             }
 
-            //Pan_Tompkins implementation
-            /*StringBuilder text= new StringBuilder();
-            for(String lineString : dataStrings){
-                text.append(lineString+"\n");
-            }
-            //System.out.println("Pan_Tompkins" + text.toString());
-            InputStream is= getResources().openRawResource(R.raw.ecg_data);
-            List<List<String>> records = new ArrayList<>();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            String line;
-            try {
-                while ((line = br.readLine()) != null) {
-                    String[] values = line.split(",");
-                    records.add(Arrays.asList(values));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Python python= Python.getInstance();
+            //Python
+            /* Python python= Python.getInstance();
             PyObject pyObject= python.getModule("Pan_Tompkins");
             PyObject args= PyObject.fromJava(records);
             PyObject object= pyObject.callAttr("findPeaksForECG", records);
@@ -480,82 +510,51 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
             double influence = 0;
 
             HashMap<String, List> resultsMap = analyzeDataForSignals(doubleData, lag, threshold, influence);
-            // print algorithm params
-//            System.out.println("lag: " + lag + "\t\tthreshold: " + threshold + "\t\tinfluence: " + influence);
-//
-//            System.out.println("Data size: " + doubleData.size());
-//            System.out.println("Signals size: " + resultsMap.get("signals").size());
 
-            // print data
-//            System.out.print("Data:\t\t");
-//            for (double d : data) {
-//                System.out.print(df.format(d) + "\t");
-//            }
-//            System.out.println();
-//
-//            // print signals
-//            System.out.print("Signals:\t");
             List<Integer> signalsList = resultsMap.get("signals");
             for (int signal : signalsList) {
-                //System.out.print(df.format(signal) + "\t");
                 if(signal > 0){
                     count++;
                 }
             }
-            //System.out.println("Count : " + count);
-//            System.out.println();
-//
-//            // print filtered data
-//            System.out.print("Filtered Data:\t");
             List<Double> filteredDataList = resultsMap.get("filteredData");
-//            for (double d : filteredDataList) {
-//                System.out.print(df.format(d) + "\t");
-//            }
-//            System.out.println();
-
-            // print running average
-//            System.out.print("Avg Filter:\t");
-//            List<Double> avgFilterList = resultsMap.get("avgFilter");
-//            for (double d : avgFilterList) {
-//                System.out.print(df.format(d) + "\t");
-//            }
-//            System.out.println();
-//
-//            // print running std
-//            System.out.print("Std filter:\t");
-//            List<Double> stdFilterList = resultsMap.get("stdFilter");
-//            for (double d : stdFilterList) {
-//                System.out.print(df.format(d) + "\t");
-//            }
-//            System.out.println();
-//
-//            System.out.println();
-//            for (int ll = 0; ll < signalsList.size(); ll++) {
-//                if (signalsList.get(ll) != 0) {
-//                    System.out.println("Point " + ll + " gave signal " + signalsList.get(ll));
-//                }
-//            }
 
             /* Heart Rate Calculation */
             counter++;
             timerData.addAll(filteredDataList);
+            if(heatRateData.size() == 0)
+                heatRateData.add(new String[]{"Heart Rate", "Avg. Heart Rate"});
             if(counter % 10 == 0) {
                 List<Integer> rPeaks = RPeakDetector.detectRPeaks(timerData);
                 double heartRate = calculateHeartRate(rPeaks, 10);
-                System.out.println("HJJJJJJJJJJJJJF " + heartRate);
                 if (heartRate > 60 && heartRate < 120) {
+                    if (avgHeartBeatRate == 0){
+                        avgHeartBeatRate = (int) heartRate;
+                        avgHeartRateEditText.setText(String.valueOf(avgHeartBeatRate));
+                    }
                     heartRateEditText.setTextIsSelectable(true);
                     heartRateEditText.setMovementMethod(LinkMovementMethod.getInstance());
                     heartRateEditText.setText(String.valueOf((int) heartRate));
+
+                    if (heartRateCount < 20){
+                        avgHeartRate += (int) heartRate;
+                        heartRateCount ++;
+                    }
+                    else {
+                        avgHeartBeatRate = avgHeartRate /20;
+                        avgHeartRateEditText.setText(String.valueOf(avgHeartBeatRate));
+
+                        heartRateCount = 0;
+                        avgHeartRate = 0;
+                    }
+
+                    heatRateData.add(new String[]{String.valueOf((int) heartRate), String.valueOf(avgHeartBeatRate)});
                 }
                 timerData = new ArrayList<>();
             }
 
             for (Double filteredData : filteredDataList) {
                 String lineString= Double.toString(filteredData);
-
-                //heartRateEditText.setText(lineString);
-//                    Log.d(TAG, "line: " + lineString);
                 final String[] valuesStrings = lineString.split("[,; \t]");
                 int j = 0;
                 for (String valueString : valuesStrings) {

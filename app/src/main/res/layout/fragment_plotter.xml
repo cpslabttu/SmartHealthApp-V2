@@ -15,19 +15,50 @@
         android:layout_weight="1"
         android:background="@color/white" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="HeartBeatRate "
-        android:textColor="@color/white" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-    <EditText
-        android:id="@+id/heartBeatRate"
-        android:layout_width="68dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
-        android:inputType="number"
-        android:textColor="@color/white"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Heart Rate "
+            android:textColor="@color/white"
+            android:layout_marginStart="20dp"
+            android:layout_weight=".50"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Avg. Heart Rate "
+            android:textColor="@color/white"
+            android:layout_marginStart="100dp"
+            android:layout_weight=".50"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/heartBeatRate"
+            android:layout_width="68dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:inputType="number"
+            android:textColor="@color/white"/>
+
+
+        <EditText
+            android:id="@+id/avgheartBeatRate"
+            android:layout_width="68dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:layout_marginStart="140dp"
+            android:textColor="@color/white"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -68,4 +99,16 @@
             android:layout_weight="1"
             android:theme="@style/SeekBarStyle" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/csv_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:ems="5"
+        android:text="CSV"
+        android:background="@drawable/rounded_btn_dark"
+        android:textColor="@color/white"
+        />
+
 </LinearLayout>
