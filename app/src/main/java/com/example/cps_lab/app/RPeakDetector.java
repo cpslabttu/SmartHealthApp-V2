@@ -91,7 +91,7 @@ public class RPeakDetector {
                 rPeaks.add(i);
             }
         }
-        System.out.println("QRS complex at index: " + rPeaks);
+        //System.out.println("QRS complex at index: " + rPeaks);
         return rPeaks;
     }
 

@@ -20,7 +20,7 @@ import java.util.List;
 
 public class AfterLoginActivity extends AppCompatActivity {
 
-    Button deviceConnect, diagonistic, logout;
+    Button deviceConnect, diagonistic, logout, instructions;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
 
@@ -34,6 +34,7 @@ public class AfterLoginActivity extends AppCompatActivity {
 
         deviceConnect = (Button) findViewById(R.id.device_connect);
         //diagonistic = (Button) findViewById(R.id.diagonistic);
+        instructions = (Button) findViewById(R.id.instructions);
         logout = (Button) findViewById(R.id.btn_logout);
 
         prefs = getSharedPreferences("UserData", MODE_PRIVATE);
@@ -54,6 +55,14 @@ public class AfterLoginActivity extends AppCompatActivity {
 //                startActivity(intent);
 //            }
 //        });
+
+        instructions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AfterLoginActivity.this, InstructionsActivity.class);
+                startActivity(intent);
+            }
+        });
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override

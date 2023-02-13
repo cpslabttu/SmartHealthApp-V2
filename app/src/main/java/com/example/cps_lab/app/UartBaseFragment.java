@@ -301,6 +301,7 @@ public abstract class UartBaseFragment extends ConnectedPeripheralFragment imple
 
         // Mqtt
         mMqttMenuItem = menu.findItem(R.id.action_mqttsettings);
+        mMqttMenuItem.setVisible(false);
         mMqttMenuItemAnimationHandler = new Handler();
         mMqttMenuItemAnimationRunnable.run();
 
@@ -311,13 +312,16 @@ public abstract class UartBaseFragment extends ConnectedPeripheralFragment imple
         if (mIsTimestampDisplayMode) {
             MenuItem displayModeTimestampMenuItem = displayModeSubMenu.findItem(R.id.action_displaymode_timestamp);
             displayModeTimestampMenuItem.setChecked(true);
+            displayModeTimestampMenuItem.setVisible(false);
         } else {
             MenuItem displayModeTextMenuItem = displayModeSubMenu.findItem(R.id.action_displaymode_text);
             displayModeTextMenuItem.setChecked(true);
+            displayModeMenuItem.setVisible(false);
         }
 
         // DataMode
         MenuItem dataModeMenuItem = menu.findItem(R.id.action_datamode);
+        dataModeMenuItem.setVisible(false);
         dataModeMenuItem.setTitle(String.format("%s: %s", getString(R.string.uart_settings_dataMode_title), getString(mShowDataInHexFormat ? R.string.uart_settings_dataMode_hex : R.string.uart_settings_dataMode_ascii)));
         SubMenu dataModeSubMenu = dataModeMenuItem.getSubMenu();
         if (mShowDataInHexFormat) {
@@ -332,14 +336,17 @@ public abstract class UartBaseFragment extends ConnectedPeripheralFragment imple
         MenuItem echoMenuItem = menu.findItem(R.id.action_echo);
         echoMenuItem.setTitle(R.string.uart_settings_echo_title);
         echoMenuItem.setChecked(mIsEchoEnabled);
+        echoMenuItem.setVisible(false);
 
         // Eol
         MenuItem eolMenuItem = menu.findItem(R.id.action_eol);
         eolMenuItem.setTitle(R.string.uart_settings_eol_title);
         eolMenuItem.setChecked(mIsEolEnabled);
+        eolMenuItem.setVisible(false);
 
         // Eol Characters
         MenuItem eolModeMenuItem = menu.findItem(R.id.action_eolmode);
+        eolModeMenuItem.setVisible(false);
         eolModeMenuItem.setTitle(String.format("%s: %s", getString(R.string.uart_settings_eolCharacters_title), getString(getEolCharactersStringId())));
         SubMenu eolModeSubMenu = eolModeMenuItem.getSubMenu();
         int selectedEolCharactersSubMenuId;

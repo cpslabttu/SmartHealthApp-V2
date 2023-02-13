@@ -177,7 +177,6 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
             setupUart();
         }
 
-        long startTime = System.currentTimeMillis();
         csvButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -450,9 +449,10 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
     // region UartDataManagerListener
     private static final byte kLineSeparator = 10;
     private int count = 0;
-    private int avgHeartRate = 0;
+    private double sumofAvgHeartBeatRate = 0;
     private int heartRateCount = 0;
-    private int avgHeartBeatRate = 0;
+    private double avgHeartBeatRate = 0;
+    private List<Double> heartRates = new ArrayList<>();
     private  String csv = (Environment.getExternalStorageDirectory().getAbsolutePath() + "/HeartRate.csv");
 
     @Override
@@ -527,28 +527,27 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
             if(counter % 10 == 0) {
                 List<Integer> rPeaks = RPeakDetector.detectRPeaks(timerData);
                 double heartRate = calculateHeartRate(rPeaks, 10);
-                if (heartRate > 60 && heartRate < 120) {
-                    if (avgHeartBeatRate == 0){
-                        avgHeartBeatRate = (int) heartRate;
-                        avgHeartRateEditText.setText(String.valueOf(avgHeartBeatRate));
-                    }
+                if (heartRate > 60 && heartRate < 140) {
                     heartRateEditText.setTextIsSelectable(true);
                     heartRateEditText.setMovementMethod(LinkMovementMethod.getInstance());
                     heartRateEditText.setText(String.valueOf((int) heartRate));
 
-                    if (heartRateCount < 20){
-                        avgHeartRate += (int) heartRate;
-                        heartRateCount ++;
+                    heartRates.add(heartRate);
+                    System.out.println("HR C " + heartRates.size() + " List " + heartRates);
+                    if (heartRates.size() <= 30){
+                        heatRateData.add(new String[]{String.valueOf((int) heartRate), "0"});
                     }
                     else {
-                        avgHeartBeatRate = avgHeartRate /20;
-                        avgHeartRateEditText.setText(String.valueOf(avgHeartBeatRate));
-
-                        heartRateCount = 0;
-                        avgHeartRate = 0;
+                        for(int hrC=0;hrC<30;hrC++){
+                            sumofAvgHeartBeatRate += heartRates.get(hrC);
+                        }
+                        avgHeartBeatRate = sumofAvgHeartBeatRate /30;
+                        avgHeartRateEditText.setText(String.valueOf((int) avgHeartBeatRate));
+                        heatRateData.add(new String[]{String.valueOf((int) heartRate), String.valueOf((int) avgHeartBeatRate)});
+                        heartRates = shiftLeft(heartRates);
+                        sumofAvgHeartBeatRate = 0;
                     }
 
-                    heatRateData.add(new String[]{String.valueOf((int) heartRate), String.valueOf(avgHeartBeatRate)});
                 }
                 timerData = new ArrayList<>();
             }
@@ -713,6 +712,15 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
         double heartRate = 60 / avgRRInterval;
         return heartRate;
     }
+
+    public static List<Double> shiftLeft(List<Double> list) {
+        for (int i = 0; i < list.size() - 1; i++) {
+            list.set(i, list.get(i + 1));
+        }
+        list.remove(list.size()-1);
+        return list;
+    }
+
 
     // endregion
 }
