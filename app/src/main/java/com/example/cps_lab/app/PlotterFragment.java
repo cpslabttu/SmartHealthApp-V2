@@ -3,6 +3,7 @@ package com.example.cps_lab.app;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothGatt;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.os.Bundle;
@@ -76,6 +77,8 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
     private EditText heartRateEditText;
     private EditText avgHeartRateEditText;
 
+    private Button backDashboard;
+
     // Data
     private UartDataManager mUartDataManager;
     private long mOriginTimestamp;
@@ -89,7 +92,6 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 
     private ArrayList<Double> timerData = new ArrayList<>();
     private int counter = 0;
-    private Button csvButton;
 
     private List<String[]> heatRateData = new ArrayList<String[]>();
 
@@ -129,8 +131,6 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
         mChart = view.findViewById(R.id.chart);
         heartRateEditText= view.findViewById(R.id.heartBeatRate);
         avgHeartRateEditText= view.findViewById(R.id.avgheartBeatRate);
-        csvButton = view.findViewById(R.id.csv_button);
-        csvButton.setVisibility(View.GONE);
         WeakReference<PlotterFragment> weakThis = new WeakReference<>(this);
         SwitchCompat autoscrollSwitch = view.findViewById(R.id.autoscrollSwitch);
         autoscrollSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -177,21 +177,16 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
             setupUart();
         }
 
-        csvButton.setOnClickListener(new View.OnClickListener() {
+        backDashboard = view.findViewById(R.id.back_dashboard);
+        backDashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                CSVWriter writer = null;
-                try {
-                    writer = new CSVWriter(new FileWriter(csv));
-                    writer.writeAll(heatRateData); // data is adding to csv
-
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                onDestroy();
+                Intent intent = new Intent(context, AfterLoginActivity.class);
+                startActivity(intent);
             }
         });
+
     }
 
     @Override

@@ -119,11 +119,19 @@ public class UartDataManager implements BlePeripheralUart.UartRxHandler {
             // Append new data to previous data
             final byte[] previousData = mRxDatas.get(identifier);
             final int previousDataLength = previousData == null ? 0 : previousData.length;
-            byte[] destinationData = new byte[previousDataLength + data.length];
+            byte[] destinationData;
+            if(data != null){
+                destinationData = new byte[previousDataLength + data.length];
+            }
+            else {
+                destinationData = new byte[previousDataLength];
+            }
             if (previousData != null) {
                 System.arraycopy(previousData, 0, destinationData, 0, previousDataLength);
             }
-            System.arraycopy(data, 0, destinationData, previousDataLength, data.length);
+            if(data != null){
+                System.arraycopy(data, 0, destinationData, previousDataLength, data.length);
+            }
 
             mRxDatas.put(identifier, destinationData);
 

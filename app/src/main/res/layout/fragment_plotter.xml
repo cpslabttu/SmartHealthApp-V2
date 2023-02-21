@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/grey_200"
     android:orientation="vertical"
     tools:context=".app.PlotterFragment">
 
@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Heart Rate "
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:layout_marginStart="20dp"
             android:layout_weight=".50"/>
 
@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Avg. Heart Rate "
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:layout_marginStart="100dp"
             android:layout_weight=".50"/>
 
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:inputType="number"
-            android:textColor="@color/white"/>
+            android:textColor="@color/blue_900"/>
 
 
         <EditText
@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:inputType="number"
             android:layout_marginStart="140dp"
-            android:textColor="@color/white"/>
+            android:textColor="@color/blue_900"/>
 
     </LinearLayout>
 
@@ -74,7 +74,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/plotter_autoscroll"
-            android:textColor="@color/infotext" />
+            android:textColor="@color/black" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/autoscrollSwitch"
@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:text="@string/plotter_width"
-            android:textColor="@color/infotext" />
+            android:textColor="@color/black" />
 
         <SeekBar
             android:id="@+id/xMaxEntriesSeekBar"
@@ -99,16 +99,32 @@
             android:layout_weight="1"
             android:theme="@style/SeekBarStyle" />
     </LinearLayout>
-
-    <Button
-        android:id="@+id/csv_button"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:ems="5"
-        android:text="CSV"
-        android:background="@drawable/rounded_btn_dark"
-        android:textColor="@color/white"
-        />
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/back_dashboard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:hint="Dashboard"
+            android:padding="10dp"
+            android:background="@drawable/roundedbutton"
+            android:textColorHint="#fff"
+            android:textSize="20sp"
+            android:minWidth="150dp"
+            android:textStyle="bold|italic"
+            />
+
+    </LinearLayout>
+
+
 
 </LinearLayout>

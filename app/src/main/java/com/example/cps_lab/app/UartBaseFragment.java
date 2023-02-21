@@ -84,6 +84,7 @@ public abstract class UartBaseFragment extends ConnectedPeripheralFragment imple
     private TextView mSentBytesTextView;
     private TextView mReceivedBytesTextView;
     protected Spinner mSendPeripheralSpinner;
+    private Button backDashboard;
 
     // UI TextBuffer (refreshing the text buffer is managed with a timer because a lot of changes can arrive really fast and could stall the main thread)
     private final Handler mUIRefreshTimerHandler = new Handler();
@@ -166,6 +167,7 @@ public abstract class UartBaseFragment extends ConnectedPeripheralFragment imple
 
         // Send Text
         mSendEditText = view.findViewById(R.id.sendEditText);
+        mSendEditText.setVisibility(View.GONE);
         mSendEditText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 onClickSend();
@@ -180,7 +182,18 @@ public abstract class UartBaseFragment extends ConnectedPeripheralFragment imple
             }
         });
 
+        backDashboard = view.findViewById(R.id.back_dashboard);
+        backDashboard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onDestroy();
+                Intent intent = new Intent(context, AfterLoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
         mSendButton = view.findViewById(R.id.sendButton);
+        mSendButton.setVisibility(View.GONE);
         mSendButton.setOnClickListener(view12 -> onClickSend());
 
         final boolean isInMultiUartMode = isInMultiUartMode();
@@ -189,6 +202,7 @@ public abstract class UartBaseFragment extends ConnectedPeripheralFragment imple
 
         // Counters
         mSentBytesTextView = view.findViewById(R.id.sentBytesTextView);
+        mSentBytesTextView.setVisibility(View.GONE);
         mReceivedBytesTextView = view.findViewById(R.id.receivedBytesTextView);
 
         // Read shared preferences

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/grey_200"
     tools:context=".app.UartModeFragment">
 
     <LinearLayout
@@ -16,7 +16,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#cccccc"
+            android:background="@color/grey_200"
             android:orientation="horizontal">
 
             <EditText
@@ -39,6 +39,21 @@
                 android:id="@+id/sendPeripheralSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/back_dashboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:hint="Dashboard"
+                android:padding="10dp"
+                android:background="@drawable/roundedbutton"
+                android:textColorHint="#fff"
+                android:textSize="20sp"
+                android:minWidth="150dp"
+                android:textStyle="bold|italic"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -61,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:text="@string/uart_receivedbytes_format"
-                android:textColor="@color/infotext" />
+                android:textColor="@color/blue_A700" />
 
         </LinearLayout>
 

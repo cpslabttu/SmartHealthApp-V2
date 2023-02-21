@@ -200,6 +200,8 @@ public class BleUtils {
 
     public static String bytesToHex2(byte[] bytes) {
         StringBuilder stringBuffer = new StringBuilder();
+        if(bytes == null)
+            return stringBuffer.toString();
         for (byte aByte : bytes) {
             String charString = String.format("%02X", (byte) aByte);
 

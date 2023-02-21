@@ -75,7 +75,9 @@ public class UartPacketManagerBase implements BlePeripheralUart.UartRxHandler {
         } catch (InterruptedException e) {
             Log.w(TAG, "InterruptedException: " + e.toString());
         }
-        mReceivedBytes += data.length;
+        if(data != null) {
+            mReceivedBytes += data.length;
+        }
         if (mIsPacketCacheEnabled) {
             mPackets.add(uartPacket);
         }
