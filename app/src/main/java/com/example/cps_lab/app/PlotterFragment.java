@@ -520,6 +520,22 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
             if(heatRateData.size() == 0)
                 heatRateData.add(new String[]{"Heart Rate", "Avg. Heart Rate"});
             if(counter % 10 == 0) {
+
+                /* Pre Trained Machine Learning Model */
+                Context context = getContext();
+                try {
+                    PreTrainedModelforArrythmiaDetection model = new PreTrainedModelforArrythmiaDetection(context, "Detect_Arrhythmia.tflite");
+                    float[] inputData = new float[timerData.size()];
+                    for(int input = 0; input < inputData.length; input++){
+                        inputData[i] = timerData.get(i).floatValue();
+                    }
+                    int predictClasss = model.predictArrhythmiaClass(inputData, context, "Detect_Arrhythmia.tflite");
+                    Log.d("PredictClasss         ", String.valueOf(predictClasss));
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 List<Integer> rPeaks = RPeakDetector.detectRPeaks(timerData);
                 double heartRate = calculateHeartRate(rPeaks, 10);
                 if (heartRate > 60 && heartRate < 140) {

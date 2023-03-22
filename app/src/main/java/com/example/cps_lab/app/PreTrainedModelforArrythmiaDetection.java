@@ -42,14 +42,14 @@ public class PreTrainedModelforArrythmiaDetection {
         ByteBuffer inputBuffer = ByteBuffer.allocateDirect(inputData.length * 4);
         inputBuffer.order(ByteOrder.nativeOrder());
         for (float input : inputData) {
-            inputBuffer.putFloat( input);
+            inputBuffer.putFloat(input);
         }
         return inputBuffer;
     }
 
     // Make predictions on the input data
     public int predictArrhythmiaClass(float[] inputData, Context context, String modelPath) throws IOException {
-        float[] preprocessedSignal = preprocessSignal(inputData, 3000);
+        float[] preprocessedSignal = preprocessSignal(inputData, 10000);
         ByteBuffer inputBuffer = createInputBuffer(inputData);
         int inputSize = inputData.length;
         int outputSize = 4;  // number of output classes
@@ -60,7 +60,7 @@ public class PreTrainedModelforArrythmiaDetection {
         Interpreter interpreter = new Interpreter(loadModelFile(context.getAssets(), modelPath));
 
         // Prepare the input data
-        float[][] input = {inputData};
+        float[][] input = {preprocessedSignal};
 
         // Prepare the output data buffer
         float[][] output = new float[1][4];
@@ -96,8 +96,11 @@ public class PreTrainedModelforArrythmiaDetection {
         }
         double mean = stats.getMean();
         double std = stats.getStandardDeviation();
-        for (int i = 0; i < signalLength; i++) {
-            preprocessedSignal[i] = (float) ((signal[i] - mean) / std);
+        for (int i = 0, j=0; i < signalLength; i++, j++) {
+            if(j >= signal.length) {
+                j = 0;
+            }
+            preprocessedSignal[i] = (float) ((signal[j] - mean) / std);
         }
 
         return preprocessedSignal;
