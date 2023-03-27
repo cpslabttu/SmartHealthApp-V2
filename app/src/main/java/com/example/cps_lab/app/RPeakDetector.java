@@ -71,19 +71,19 @@ public class RPeakDetector {
 
         double[] filteredEcg = filterEcg(ecg);
 
-        // Differentiate the filtered ECG signal
-        double[] differentiatedEcg = differentiateEcg(filteredEcg);
-
-        // Square the differentiated ECG signal
-        double[] squaredEcg = squareEcg(differentiatedEcg);
+        // Square the filtered ECG signal
+        double[] squaredEcg = squareEcg(filteredEcg);
 
         // Integrate the squared ECG signal
         double[] integratedEcg = integrateEcg(squaredEcg);
 
+        // Differentiate the integrated ECG signal
+        double[] differentiatedEcg = differentiateEcg(integratedEcg);
+
         // Find the QRS complex in the integrated ECG signal
 //        ArrayList<Integer> qrsIndex = findQRS(integratedEcg, 0.5);
 
-        double[] thresholdedSignal = applyThreshold(integratedEcg);
+        double[] thresholdedSignal = applyThreshold(differentiatedEcg);
         ArrayList<Integer> rPeaks = new ArrayList<>();
 
         for (int i = 0; i < thresholdedSignal.length; i++) {

@@ -517,11 +517,13 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
             /* Heart Rate Calculation */
             counter++;
             timerData.addAll(filteredDataList);
-            if(heatRateData.size() == 0)
+            if(heatRateData.size() == 0) {
                 heatRateData.add(new String[]{"Heart Rate", "Avg. Heart Rate"});
+                //heatRateData.add(new String[]{"ECG Signal"});
+            }
             if(counter % 10 == 0) {
 
-                /* Pre Trained Machine Learning Model */
+                /* Pre Trained Machine Learning Model
                 Context context = getContext();
                 try {
                     PreTrainedModelforArrythmiaDetection model = new PreTrainedModelforArrythmiaDetection(context, "Detect_Arrhythmia.tflite");
@@ -535,6 +537,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                 */
 
                 List<Integer> rPeaks = RPeakDetector.detectRPeaks(timerData);
                 double heartRate = calculateHeartRate(rPeaks, 10);
@@ -544,7 +547,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                     heartRateEditText.setText(String.valueOf((int) heartRate));
 
                     heartRates.add(heartRate);
-                    System.out.println("HR C " + heartRates.size() + " List " + heartRates);
+                    System.out.println("Size " + heartRates.size());
                     if (heartRates.size() <= 30){
                         heatRateData.add(new String[]{String.valueOf((int) heartRate), "0"});
                     }
@@ -552,12 +555,16 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                         for(int hrC=0;hrC<30;hrC++){
                             sumofAvgHeartBeatRate += heartRates.get(hrC);
                         }
-                        avgHeartBeatRate = sumofAvgHeartBeatRate /30;
+                        System.out.println("HR C " + avgHeartBeatRate);
+                        avgHeartBeatRate = sumofAvgHeartBeatRate / 30;
                         avgHeartRateEditText.setText(String.valueOf((int) avgHeartBeatRate));
                         heatRateData.add(new String[]{String.valueOf((int) heartRate), String.valueOf((int) avgHeartBeatRate)});
                         heartRates = shiftLeft(heartRates);
                         sumofAvgHeartBeatRate = 0;
                     }
+//                    for (Double d : timerData) {
+//                        heatRateData.add(new String[]{Double.toString(d)});
+//                    }
 
                 }
                 timerData = new ArrayList<>();
@@ -565,6 +572,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 
             for (Double filteredData : filteredDataList) {
                 String lineString= Double.toString(filteredData);
+                //System.out.println("LINE String " + lineString);
                 final String[] valuesStrings = lineString.split("[,; \t]");
                 int j = 0;
                 for (String valueString : valuesStrings) {
@@ -680,7 +688,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                 }
                 heartRate /= (rPeaks.size() - 1); // average heart rate
 
-                System.out.println("UCCCCCCCCCCCCCCCCCCCCCC " + heartRate);
+                System.out.println("Heart Rate in a Window " + heartRate);
 
                 heartRateEditText.setTextIsSelectable(true);
                 heartRateEditText.setMovementMethod(LinkMovementMethod.getInstance());

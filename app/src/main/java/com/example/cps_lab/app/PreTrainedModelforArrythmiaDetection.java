@@ -8,7 +8,9 @@ import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,32 +49,33 @@ public class PreTrainedModelforArrythmiaDetection {
         return inputBuffer;
     }
 
-    // Make predictions on the input data
     public int predictArrhythmiaClass(float[] inputData, Context context, String modelPath) throws IOException {
-        float[] preprocessedSignal = preprocessSignal(inputData, 10000);
-        ByteBuffer inputBuffer = createInputBuffer(inputData);
-        int inputSize = inputData.length;
-        int outputSize = 4;  // number of output classes
-        int[] outputShape = {1, outputSize};
-        int[] outputBuffer = new int[outputSize];
+        // Preprocess the input data
+        float[] preprocessedSignal = preprocessSignal(inputData, 159);
 
         // Initialize the interpreter
         Interpreter interpreter = new Interpreter(loadModelFile(context.getAssets(), modelPath));
 
-        // Prepare the input data
-        float[][] input = {preprocessedSignal};
+        // Prepare the input data buffer
+        int inputSize = preprocessedSignal.length;
+        TensorBuffer inputBuffer = TensorBuffer.createFixedSize(new int[]{1, inputSize}, DataType.FLOAT32);
+        ByteBuffer inputByteBuffer = ByteBuffer.allocateDirect(inputSize * 4).order(ByteOrder.nativeOrder());
+        inputByteBuffer.asFloatBuffer().put(preprocessedSignal);
+        inputBuffer.loadBuffer(inputByteBuffer);
 
         // Prepare the output data buffer
-        float[][] output = new float[1][4];
+        int outputSize = 4;  // number of output classes
+        TensorBuffer outputBuffer = TensorBuffer.createFixedSize(new int[]{1, outputSize}, DataType.FLOAT32);
 
         // Make predictions on the input data
-        interpreter.run(input, output);
+        interpreter.run(inputBuffer.getBuffer(), outputBuffer.getBuffer());
 
         // Get the predicted class
+        float[] output = outputBuffer.getFloatArray();
         int predictedClass = 0;
         float maxScore = Float.MIN_VALUE;
         for (int i = 0; i < outputSize; i++) {
-            float score = Float.intBitsToFloat(outputBuffer[i]);
+            float score = output[i];
             if (score > maxScore) {
                 predictedClass = i;
                 maxScore = score;
@@ -80,6 +83,7 @@ public class PreTrainedModelforArrythmiaDetection {
         }
         return predictedClass;
     }
+
 
     public static float[] preprocessSignal(float[] signal, int signalLength) {
         float[] preprocessedSignal = new float[signalLength];

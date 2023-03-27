@@ -27,8 +27,8 @@ public class BeforeMainActivity extends AppCompatActivity {
         guestAccess= (Button) findViewById(R.id.guestaccess);
         guestAccess.setVisibility(View.GONE);
 
-        try {
-            PreTrainedModelforArrythmiaDetection model = new PreTrainedModelforArrythmiaDetection(this, "Detect_Arrhythmia.tflite");
+        /*try {
+            PreTrainedModelforArrythmiaDetection model = new PreTrainedModelforArrythmiaDetection(this, "ANN_Classifier.tflite");
 //            float[] inputData = new float[]{
 //                    0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f,
 //                    1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.0f,
@@ -48,12 +48,12 @@ public class BeforeMainActivity extends AppCompatActivity {
 //                    15.1f, 15.2f, 15.3f, 15.4f, 15.5f, 15.6f, 15.7f, 15.8f, 15.9f, 16.0f
 //            };
             float[] inputData = new float[3000];
-            int predictClasss = model.predictArrhythmiaClass(inputData, this, "Detect_Arrhythmia.tflite");
+            int predictClasss = model.predictArrhythmiaClass(inputData, this, "ANN_Classifier.tflite");
             Log.d("PredictClasss         ", String.valueOf(predictClasss));
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
         logIn.setOnClickListener(new View.OnClickListener() {
