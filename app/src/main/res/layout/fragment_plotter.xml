@@ -123,6 +123,20 @@
             android:textStyle="bold|italic"
             />
 
+        <TextView
+            android:id="@+id/patientType"
+            android:layout_marginLeft="65dp"
+            android:padding="10dp"
+            android:textSize="20sp"
+            android:background="@drawable/rounded_btn_green"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NORMAL"
+            android:clickable="true"
+            android:onClick="toggleState" />
+
+
     </LinearLayout>
 
 
