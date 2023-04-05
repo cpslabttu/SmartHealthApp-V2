@@ -38,6 +38,7 @@ import com.example.cps_lab.ble.central.BlePeripheralUart;
 import com.example.cps_lab.ble.central.BleScanner;
 import com.example.cps_lab.ble.central.UartDataManager;
 import com.example.cps_lab.ml.AnnClassifier;
+import com.example.cps_lab.ml.ArrhythmiaOnEcgClassification;
 import com.example.cps_lab.style.UartStyle;
 import com.example.cps_lab.utils.DialogUtils;
 import com.github.mikephil.charting.charts.LineChart;
@@ -65,6 +66,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -100,7 +102,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
     private ArrayList<Double> timerData = new ArrayList<>();
     private int counter = 0;
 
-    private List<String[]> heatRateData = new ArrayList<String[]>();
+    private CopyOnWriteArrayList<String[]> heatRateData = new CopyOnWriteArrayList<>();
 
     // region Fragment Lifecycle
     public static PlotterFragment newInstance(@Nullable String singlePeripheralIdentifier) {
@@ -244,15 +246,18 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 
             case R.id.action_csv:
                 CSVWriter writer = null;
-                try {
-                    writer = new CSVWriter(new FileWriter(csv));
-                    writer.writeAll(heatRateData); // data is adding to csv
+                synchronized (heatRateData) {
+                    try {
+                        writer = new CSVWriter(new FileWriter(csv));
+                        writer.writeAll(heatRateData); // data is adding to csv
 
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                        writer.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return true;
+
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -346,7 +351,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
     }
 
     // endregion
-
+    /*
     public void toggleState(boolean patientState) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -357,6 +362,25 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                 } else {
                     patientType.setText("ABNORMAL");
                     patientType.setBackgroundResource(R.drawable.rounded_btn_red);
+                }
+            }
+        });
+    }
+    */
+
+    public void toggleState(boolean isNormal, boolean isNoise, boolean isArrhythmic) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isNormal) {
+                    patientType.setText("NORMAL");
+                    patientType.setBackgroundResource(R.drawable.rounded_btn_green);
+                } else if (isNoise) {
+                    patientType.setText("NOISE");
+                    patientType.setBackgroundResource(R.drawable.rounded_btn_red);
+                } else if (isArrhythmic) {
+                    patientType.setText("Arrhythmic");
+                    patientType.setBackgroundResource(R.drawable.rounded_btn_grey);
                 }
             }
         });
@@ -542,8 +566,8 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
             counter++;
             timerData.addAll(filteredDataList);
             if(heatRateData.size() == 0) {
-                heatRateData.add(new String[]{"Heart Rate", "Avg. Heart Rate"});
-                //heatRateData.add(new String[]{"ECG Signal"});
+                //heatRateData.add(new String[]{"Heart Rate", "Avg. Heart Rate"});
+                //heatRateData.add(new String[]{"ECG Signal", "Predicted Classification"});
             }
             if(counter % 10 == 0) {
                 List<Integer> rPeaks = RPeakDetector.detectRPeaks(timerData);
@@ -556,90 +580,111 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                     heartRates.add(heartRate);
                     System.out.println("Size " + heartRates.size());
                     if (heartRates.size() <= 30){
-                        heatRateData.add(new String[]{String.valueOf((int) heartRate), "0"});
+                        //heatRateData.add(new String[]{String.valueOf((int) heartRate), "0"});
                     }
                     else {
                         for(int hrC=0;hrC<30;hrC++){
                             sumofAvgHeartBeatRate += heartRates.get(hrC);
                         }
-                        System.out.println("HR C " + avgHeartBeatRate);
+                        //System.out.println("HR C " + avgHeartBeatRate);
                         avgHeartBeatRate = sumofAvgHeartBeatRate / 30;
                         avgHeartRateEditText.setText(String.valueOf((int) avgHeartBeatRate));
-                        heatRateData.add(new String[]{String.valueOf((int) heartRate), String.valueOf((int) avgHeartBeatRate)});
+                        //heatRateData.add(new String[]{String.valueOf((int) heartRate), String.valueOf((int) avgHeartBeatRate)});
                         heartRates = shiftLeft(heartRates);
                         sumofAvgHeartBeatRate = 0;
                     }
-//                    for (Double d : timerData) {
-//                        heatRateData.add(new String[]{Double.toString(d)});
-//                    }
-
                 }
 
-                /* Pre Trained Machine Learning Model */
-                int predictClass = 0;
-                Context context = getContext();
-                /* try {
-                    PreTrainedModelforArrythmiaDetection model = new PreTrainedModelforArrythmiaDetection(context, "ANN_Classifier.tflite");
-                    float[] inputData = new float[timerData.size()];
-                    for(int input = 0; input < inputData.length; input++){
-                        inputData[i] = timerData.get(i).floatValue();
+                if(counter % 20 == 0) {
+                    /* Pre Trained Machine Learning Model */
+                    int predictClass = 0;
+                    Context context = getContext();
+
+                    try {
+                        ArrhythmiaOnEcgClassification model = ArrhythmiaOnEcgClassification.newInstance(context);
+
+                        // Creates inputs for reference.
+                        TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 186, 1}, DataType.FLOAT32);
+
+                        // Pack ECG data into a ByteBuffer
+                        ByteBuffer byteBuffer = ByteBuffer.allocate(186 * 4);
+                        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+                        for (Double sample : timerData) {
+                            short sampleShort = (short) (sample * Short.MAX_VALUE);
+                            if (byteBuffer.remaining() == 0)
+                                break;
+                            byteBuffer.putShort(sampleShort);
+                        }
+
+                        inputFeature0.loadBuffer(byteBuffer);
+
+                        // Runs model inference and gets result.
+                        ArrhythmiaOnEcgClassification.Outputs outputs = model.process(inputFeature0);
+                        TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+
+                        // Get predicted class
+                        float[] scores = outputFeature0.getFloatArray();
+                        predictClass = getMaxIndex(scores);
+
+                        //System.out.println("score " + scores.length);
+                        System.out.println("Predicted Class: " + predictClass);
+
+
+                        // Releases model resources if no longer used.
+                        model.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    predictClasss = model.predictArrhythmiaClass(inputData, context, "ANN_Classifier.tflite");
-                    //Log.d("PredictClasss         ", String.valueOf(predictClasss));
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if(predictClasss == 0){
-                    toggleState(true);
-                }
-                else {
-                    toggleState(false);
-                } */
+//                for (Double d : timerData) {
+//                    heatRateData.add(new String[]{Double.toString(d), Integer.toString(predictClass)});
+//                }
 
-                try {
-                    AnnClassifier model = AnnClassifier.newInstance(context);
+                    if (predictClass == 0) {
 
-                    // Creates inputs for reference.
-                    TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 159}, DataType.FLOAT32);
+                        try {
+                            AnnClassifier model = AnnClassifier.newInstance(context);
 
-                    // Pack ECG data into a ByteBuffer
-                    ByteBuffer byteBuffer = ByteBuffer.allocate(159 * 4);
-                    byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-                    for (Double sample : timerData) {
-                        short sampleShort = (short) (sample * Short.MAX_VALUE);
-                        if(byteBuffer.remaining() == 0)
-                            break;
-                        byteBuffer.putShort(sampleShort);
+                            // Creates inputs for reference.
+                            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 159}, DataType.FLOAT32);
+
+                            // Pack ECG data into a ByteBuffer
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(159 * 4);
+                            byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+                            for (Double sample : timerData) {
+                                short sampleShort = (short) (sample * Short.MAX_VALUE);
+                                if (byteBuffer.remaining() == 0)
+                                    break;
+                                byteBuffer.putShort(sampleShort);
+                            }
+
+                            inputFeature0.loadBuffer(byteBuffer);
+
+                            // Runs model inference and gets result.
+                            AnnClassifier.Outputs outputs = model.process(inputFeature0);
+                            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+
+                            // Get predicted class
+                            float[] scores = outputFeature0.getFloatArray();
+                            predictClass = getMaxIndexforANN(scores);
+
+                            // Releases model resources if no longer used.
+                            model.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (predictClass == 1) {
+                            toggleState(true, false, false);
+                        } else {
+                            toggleState(false, true, false);
+                        }
+                    } else if (predictClass == 2) {
+                        toggleState(false, false, true);
+                    } else {
+                        toggleState(false, true, false);
                     }
 
-                    inputFeature0.loadBuffer(byteBuffer);
-
-                    // Runs model inference and gets result.
-                    AnnClassifier.Outputs outputs = model.process(inputFeature0);
-                    TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
-
-                    // Get predicted class
-                    float[] scores = outputFeature0.getFloatArray();
-                    predictClass = getMaxIndex(scores);
-
-                    System.out.println("Predicted Class: " + predictClass);
-
-
-                    // Releases model resources if no longer used.
-                    model.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-
-
-                if(predictClass == 0){
-                    toggleState(false);
-                }
-                else {
-                    toggleState(true);
-                }
-
                 timerData = new ArrayList<>();
 
             }
@@ -678,14 +723,28 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
         mUartDataManager.removeRxCacheFirst(lastSeparator, peripheralIdentifier);
     }
 
-    public int getMaxIndex(float[] arr) {
+    public static int getMaxIndex(float[] array) {
         int maxIndex = 0;
-        for(float score : arr) {
-            if(score > maxIndex)
-                return 1;
+        float maxValue = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > maxValue) {
+                maxValue = array[i];
+                maxIndex = i;
+            }
         }
         return maxIndex;
     }
+
+    public static int getMaxIndexforANN(float[] array) {
+        int maxIndex = 0;
+        for(int i=0;i<array.length;i++){
+            if(array[i] > maxIndex)
+                return 1;
+        }
+        return 0;
+    }
+
+
 
     public HashMap<String, List> analyzeDataForSignals(List<Double> data, int lag, Double threshold, Double influence) {
 
