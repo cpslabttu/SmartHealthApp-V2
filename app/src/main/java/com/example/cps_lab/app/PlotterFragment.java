@@ -377,7 +377,12 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                     patientType.setBackgroundResource(R.drawable.rounded_btn_green);
                 } else if (isNoise) {
                     patientType.setText(pType);
-                    patientType.setBackgroundResource(R.drawable.rounded_btn_grey);
+                    if (pType.equals("Abnormal")) {
+                        patientType.setBackgroundResource(R.drawable.rounded_btn_orange);
+                    }
+                    else {
+                        patientType.setBackgroundResource(R.drawable.rounded_btn_grey);
+                    }
                 } else if (isArrhythmic) {
                     patientType.setText(pType);
                     patientType.setBackgroundResource(R.drawable.rounded_btn_red);
@@ -690,12 +695,12 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                     if (predictClass[algoCounter] == 0) {
                         toggleState(true, false, false, "NORMAL");
                     } else {
-                        toggleState(false, true, false, "Too Noisy");
+                        toggleState(false, true, false, "NOISY");
                     }
                 } else if (predictforArrhythmia == 2 && algoCounter == 9) {
                     toggleState(false, false, true, "Arrhythmic");
                 } else if (predictforArrhythmia != 2){
-                    toggleState(false, true, false, "Less Noisy");
+                    toggleState(false, true, false, "Abnormal");
                 }
 
                 timerData = new ArrayList<>();
