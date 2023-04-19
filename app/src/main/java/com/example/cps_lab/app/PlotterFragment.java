@@ -87,6 +87,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 
     private Button backDashboard;
     private TextView patientType;
+    private TextView arrhythmic;
 
     // Data
     private UartDataManager mUartDataManager;
@@ -197,6 +198,8 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
         });
 
         patientType = view.findViewById(R.id.patientType);
+        arrhythmic = view.findViewById(R.id.arrhythmic);
+        arrhythmic.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -380,12 +383,16 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                     if (pType.equals("Abnormal")) {
                         patientType.setBackgroundResource(R.drawable.rounded_btn_orange);
                     }
+                    else if (pType.equals("SV")) {
+                        patientType.setBackgroundResource(R.drawable.rounded_btn_blue);
+                    }
                     else {
                         patientType.setBackgroundResource(R.drawable.rounded_btn_grey);
                     }
                 } else if (isArrhythmic) {
                     patientType.setText(pType);
                     patientType.setBackgroundResource(R.drawable.rounded_btn_red);
+                    arrhythmic.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -608,14 +615,15 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                 /* Pre Trained Machine Learning Model */
                 Context context = getContext();
 
+
                 try {
-                    ArrhythmiaOnEcgClassification model = ArrhythmiaOnEcgClassification.newInstance(context);
+                    AnnClassifier model = AnnClassifier.newInstance(context);
 
                     // Creates inputs for reference.
-                    TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 186, 1}, DataType.FLOAT32);
+                    TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 159}, DataType.FLOAT32);
 
                     // Pack ECG data into a ByteBuffer
-                    ByteBuffer byteBuffer = ByteBuffer.allocate(186 * 4);
+                    ByteBuffer byteBuffer = ByteBuffer.allocate(159 * 4);
                     byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
                     for (Double sample : timerData) {
                         short sampleShort = (short) (sample * Short.MAX_VALUE);
@@ -627,29 +635,13 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                     inputFeature0.loadBuffer(byteBuffer);
 
                     // Runs model inference and gets result.
-                    ArrhythmiaOnEcgClassification.Outputs outputs = model.process(inputFeature0);
+                    AnnClassifier.Outputs outputs = model.process(inputFeature0);
                     TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
 
                     // Get predicted class
                     float[] scores = outputFeature0.getFloatArray();
-                    predictClass[algoCounter] = getMaxIndex(scores);
+                    predictClass[algoCounter] = getMaxIndexforANN(scores);
 
-                    //System.out.println("PredictClass " + algoCounter + " " + predictClass[algoCounter]);
-
-                    if(algoCounter == 9){
-                        int[] classes = new int[5];
-
-                        for (int algoC=0; algoC<=algoCounter; algoC++){
-                            int pClass = (int) predictClass[algoC];
-//                            System.out.println("In Loop PredictClass " + algoC + " " + predictClass[algoC]);
-//                            System.out.println("P Class " + pClass);
-                            classes[pClass]++;
-                        }
-                        predictforArrhythmia = getMaxIndexforInt(classes);
-//                        for (int cls=0; cls<classes.length; cls++){
-//                            System.out.println("Classes " + cls + " " + classes[cls] + " " + predictforArrhythmia);
-//                        }
-                    }
                     // Releases model resources if no longer used.
                     model.close();
                 } catch (IOException e) {
@@ -659,16 +651,15 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                 //                heatRateData.add(new String[]{Double.toString(d), Integer.toString(predictClass)});
                 //               }
 
-                if (predictClass[algoCounter] == 0 && predictforArrhythmia != 2) {
-
+                if (predictClass[algoCounter] == 0) {
                     try {
-                        AnnClassifier model = AnnClassifier.newInstance(context);
+                        ArrhythmiaOnEcgClassification model = ArrhythmiaOnEcgClassification.newInstance(context);
 
                         // Creates inputs for reference.
-                        TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 159}, DataType.FLOAT32);
+                        TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 186, 1}, DataType.FLOAT32);
 
                         // Pack ECG data into a ByteBuffer
-                        ByteBuffer byteBuffer = ByteBuffer.allocate(159 * 4);
+                        ByteBuffer byteBuffer = ByteBuffer.allocate(186 * 4);
                         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
                         for (Double sample : timerData) {
                             short sampleShort = (short) (sample * Short.MAX_VALUE);
@@ -680,27 +671,49 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                         inputFeature0.loadBuffer(byteBuffer);
 
                         // Runs model inference and gets result.
-                        AnnClassifier.Outputs outputs = model.process(inputFeature0);
+                        ArrhythmiaOnEcgClassification.Outputs outputs = model.process(inputFeature0);
                         TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
 
                         // Get predicted class
                         float[] scores = outputFeature0.getFloatArray();
-                        predictClass[algoCounter] = getMaxIndexforANN(scores);
+                        predictClass[algoCounter] = getMaxIndex(scores);
+
+                        if(algoCounter == 9){
+                            int[] classes = new int[5];
+
+                            for (int algoC=0; algoC<=algoCounter; algoC++){
+                                int pClass = (int) predictClass[algoC];
+                                classes[pClass]++;
+                            }
+                            predictforArrhythmia = getMaxIndexforInt(classes);
+                            for (int cls=0; cls<classes.length; cls++){
+                                System.out.println("Classes " + cls + " " + classes[cls] + " " + predictforArrhythmia + " " + getMaxIndexforInt(classes));
+                            }
+                        }
 
                         // Releases model resources if no longer used.
                         model.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    if (predictClass[algoCounter] == 0) {
-                        toggleState(true, false, false, "NORMAL");
-                    } else {
-                        toggleState(false, true, false, "NOISY");
+                    System.out.println("PredictClass " + algoCounter + " " + predictforArrhythmia);
+                    if (predictforArrhythmia == 2 && algoCounter == 9) {
+                        toggleState(false, false, true, "Arrhythmic");
                     }
-                } else if (predictforArrhythmia == 2 && algoCounter == 9) {
-                    toggleState(false, false, true, "Arrhythmic");
-                } else if (predictforArrhythmia != 2){
-                    toggleState(false, true, false, "Abnormal");
+                    else if (predictClass[algoCounter] == 0 && predictforArrhythmia !=2) {
+                        toggleState(true, false, false, "NORMAL");
+                    }
+                    else if(predictClass[algoCounter] == 1 && predictforArrhythmia != 2){
+                        toggleState(false, true,    false, "SV");
+                    }
+                    else if(predictClass[algoCounter] == 3 && predictforArrhythmia != 2){
+                        toggleState(false, true,    false, "Fusion");
+                    }
+                    else if(predictClass[algoCounter] == 4 && predictforArrhythmia != 2){
+                        toggleState(false, true,    false, "Abnormal");
+                    }
+                } else {
+                    toggleState(false, true, false, "NOISY");
                 }
 
                 timerData = new ArrayList<>();
@@ -708,7 +721,6 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                 if(algoCounter > 9){
                     algoCounter = 0;
                 }
-
             }
 
             for (Double filteredData : filteredDataList) {
@@ -739,7 +751,6 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 
                 mMainHandler.post(this::notifyDataSetChanged);
             }
-            //timerSetUp();
         }
 
         mUartDataManager.removeRxCacheFirst(lastSeparator, peripheralIdentifier);
