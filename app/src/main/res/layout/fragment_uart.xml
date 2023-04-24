@@ -42,18 +42,16 @@
 
             <Button
                 android:id="@+id/back_dashboard"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="90dp"
+                android:layout_height="47dp"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:hint="Dashboard"
+                android:background="@drawable/three_lines"
+                android:minWidth="150dp"
                 android:padding="10dp"
-                android:background="@drawable/roundedbutton"
                 android:textColorHint="#fff"
                 android:textSize="20sp"
-                android:minWidth="150dp"
-                android:textStyle="bold|italic"
-                />
+                android:textStyle="bold|italic" />
         </LinearLayout>
 
         <LinearLayout

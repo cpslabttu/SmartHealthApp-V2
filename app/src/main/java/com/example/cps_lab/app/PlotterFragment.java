@@ -58,9 +58,11 @@ import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +90,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
     private Button backDashboard;
     private TextView patientType;
     private TextView arrhythmic;
+    private TextView timeStamp;
 
     // Data
     private UartDataManager mUartDataManager;
@@ -200,6 +203,8 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
         patientType = view.findViewById(R.id.patientType);
         arrhythmic = view.findViewById(R.id.arrhythmic);
         arrhythmic.setVisibility(View.INVISIBLE);
+        timeStamp = view.findViewById(R.id.timestamp);
+        timeStamp.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -393,6 +398,16 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                     patientType.setText(pType);
                     patientType.setBackgroundResource(R.drawable.rounded_btn_red);
                     arrhythmic.setVisibility(View.VISIBLE);
+
+                    // Get the current time
+                    Date currentTime = new Date();
+
+                    // Format the time to show only the hours and minutes
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                    String formattedTime = sdf.format(currentTime);
+
+                    timeStamp.setVisibility(View.VISIBLE);
+                    timeStamp.setText(String.format("Time Stamp: %s", formattedTime));
                 }
             }
         });
