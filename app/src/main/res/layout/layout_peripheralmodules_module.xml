@@ -12,10 +12,9 @@
 
     <ImageView
         android:id="@+id/iconImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/tab_info_icon"
-        android:tint="@color/green_900" />
+        android:layout_width="145dp"
+        android:layout_height="68dp"
+        android:src="@drawable/tab_info_icon" />
 
     <TextView
         android:id="@+id/nameTextView"

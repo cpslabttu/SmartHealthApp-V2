@@ -36,7 +36,6 @@ import com.example.cps_lab.utils.LocalizationManager;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class PeripheralModulesFragment extends ConnectedPeripheralFragment {
     // Log
@@ -411,12 +410,12 @@ public class PeripheralModulesFragment extends ConnectedPeripheralFragment {
                             break;
 
                         case MODULE_UART:
-                            iconDrawableId = R.drawable.tab_uart_icon;
+                            iconDrawableId = R.drawable.tab_data_icon;
                             titleId = R.string.uart_tab_title;
                             break;
 
                         case MODULE_PLOTTER:
-                            iconDrawableId = R.drawable.tab_plotter_icon;
+                            iconDrawableId = R.drawable.tab_myplotter_icon;
                             titleId = R.string.plotter_tab_title;
                             break;
 

@@ -713,7 +713,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                                 int pClass = (int) predictClass[algoC];
                                 classes[pClass]++;
                             }
-                            predictforArrhythmia = 2;//getMaxIndexforInt(classes);
+                            predictforArrhythmia = getMaxIndexforInt(classes);
                             for (int cls=0; cls<classes.length; cls++){
                                 System.out.println("Classes " + cls + " " + classes[cls] + " " + predictforArrhythmia + " " + getMaxIndexforInt(classes));
                             }
