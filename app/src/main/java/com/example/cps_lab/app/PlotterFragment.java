@@ -38,6 +38,7 @@ import com.example.cps_lab.ble.central.BlePeripheralUart;
 import com.example.cps_lab.ble.central.BleScanner;
 import com.example.cps_lab.ble.central.UartDataManager;
 import com.example.cps_lab.ml.AnnClassifier;
+import com.example.cps_lab.ml.AnnMulticlass;
 import com.example.cps_lab.ml.ArrhythmiaOnEcgClassification;
 import com.example.cps_lab.style.UartStyle;
 import com.example.cps_lab.utils.DialogUtils;
@@ -668,25 +669,37 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
 
                 if (predictClass[algoCounter] == 0) {
                     try {
-                        ArrhythmiaOnEcgClassification model = ArrhythmiaOnEcgClassification.newInstance(context);
+                        AnnMulticlass model = AnnMulticlass.newInstance(context);
 
                         // Creates inputs for reference.
-                        TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 186, 1}, DataType.FLOAT32);
+                        TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 186}, DataType.FLOAT32);
+
+                        // Find the minimum and maximum values of the ECG data
+                        double ecgMin = Double.MAX_VALUE;
+                        double ecgMax = Double.MIN_VALUE;
+                        for (Double sample : timerData) {
+                            if (sample < ecgMin) {
+                                ecgMin = sample;
+                            }
+                            if (sample > ecgMax) {
+                                ecgMax = sample;
+                            }
+                        }
 
                         // Pack ECG data into a ByteBuffer
                         ByteBuffer byteBuffer = ByteBuffer.allocate(186 * 4);
                         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
                         for (Double sample : timerData) {
-                            short sampleShort = (short) (sample * Short.MAX_VALUE);
+                            float samplefloat = (float) ((sample - ecgMin) / (ecgMax - ecgMin));
                             if (byteBuffer.remaining() == 0)
                                 break;
-                            byteBuffer.putShort(sampleShort);
+                            byteBuffer.putFloat(samplefloat);
                         }
 
                         inputFeature0.loadBuffer(byteBuffer);
 
                         // Runs model inference and gets result.
-                        ArrhythmiaOnEcgClassification.Outputs outputs = model.process(inputFeature0);
+                        AnnMulticlass.Outputs outputs = model.process(inputFeature0);
                         TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
 
                         // Get predicted class
@@ -700,7 +713,7 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                                 int pClass = (int) predictClass[algoC];
                                 classes[pClass]++;
                             }
-                            predictforArrhythmia = getMaxIndexforInt(classes);
+                            predictforArrhythmia = 2;//getMaxIndexforInt(classes);
                             for (int cls=0; cls<classes.length; cls++){
                                 System.out.println("Classes " + cls + " " + classes[cls] + " " + predictforArrhythmia + " " + getMaxIndexforInt(classes));
                             }
@@ -715,16 +728,16 @@ public class PlotterFragment extends ConnectedPeripheralFragment implements Uart
                     if (predictforArrhythmia == 2 && algoCounter == 9) {
                         toggleState(false, false, true, "Arrhythmic");
                     }
-                    else if (predictClass[algoCounter] == 0 && predictforArrhythmia !=2) {
+                    else if (predictforArrhythmia == 0 && algoCounter == 9) {
                         toggleState(true, false, false, "NORMAL");
                     }
-                    else if(predictClass[algoCounter] == 1 && predictforArrhythmia != 2){
+                    else if(predictforArrhythmia == 1 && algoCounter == 9){
                         toggleState(false, true,    false, "SV");
                     }
-                    else if(predictClass[algoCounter] == 3 && predictforArrhythmia != 2){
+                    else if(predictforArrhythmia == 3 && algoCounter == 9){
                         toggleState(false, true,    false, "Fusion");
                     }
-                    else if(predictClass[algoCounter] == 4 && predictforArrhythmia != 2){
+                    else if(predictforArrhythmia == 4 && algoCounter == 9){
                         toggleState(false, true,    false, "Abnormal");
                     }
                 } else {
